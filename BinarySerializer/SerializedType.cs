@@ -90,6 +90,8 @@ namespace BinarySerialization
         /// <summary>
         ///     An encoded string prefixed with a LEB128-encoded length.  This is equivalent to how BinaryWriter encodes a string.
         /// </summary>
-        LengthPrefixedString
+        LengthPrefixedString,
+
+        CustomSerializer
     }
 }

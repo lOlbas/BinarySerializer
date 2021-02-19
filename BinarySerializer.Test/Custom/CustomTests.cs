@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using BinarySerialization.Test.SerializeAs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BinarySerialization.Test.Custom
@@ -95,7 +97,7 @@ namespace BinarySerialization.Test.Custom
         {
             var expected = new CustomListClass {"hello"};
             var actual = Roundtrip(expected);
-            
+
             CollectionAssert.AreEqual(expected, actual);
         }
 
@@ -107,5 +109,52 @@ namespace BinarySerialization.Test.Custom
 
         //    Assert.AreEqual(expected, actual);
         //}
+
+        [TestMethod]
+        public void ProtoBufSerializerTest()
+        {
+            var expected = new ProtoBufEvent
+            {
+                DataLength = 5,
+                OpCode = EventTypes.Ping,
+                ProtoData = new PingEvent()
+                {
+                    Serial = 67305985
+                }
+            };
+            var actual = Roundtrip(expected);
+
+            Assert.AreEqual(expected, actual);
+
+            var expected2 = new ProtoBufEvent
+            {
+                DataLength = 11,
+                OpCode = EventTypes.Pong,
+                ProtoData = new PongEvent()
+                {
+                    Serial = 67305985,
+                    Time = 1275472149
+                }
+            };
+            var actual2 = Roundtrip(expected2);
+
+            Assert.AreEqual(expected2, actual2);
+        }
+
+        [TestMethod]
+        public void JsonSerializerTest()
+        {
+            var expected = new EventWithJSON
+            {
+                CollectionSize = 1,
+                Params = new Dictionary<string, string>()
+                {
+                    {"Key_1", "Value_1"}
+                }
+            };
+            var actual = Roundtrip(expected);
+
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

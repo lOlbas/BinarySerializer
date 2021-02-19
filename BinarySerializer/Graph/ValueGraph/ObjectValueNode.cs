@@ -159,6 +159,20 @@ namespace BinarySerialization.Graph.ValueGraph
                 return;
             }
 
+            if (TypeNode.CustomSerializerType != null)
+            {
+                var customSerializer = Activator.CreateInstance(TypeNode.CustomSerializerType) as CustomSerializer;
+
+                if (customSerializer == null)
+                {
+                    throw new Exception("Could not instantiate CustomSerializer.");
+                }
+                
+                customSerializer.Serialize(stream, Value);
+                
+                return;
+            }
+
             var serializableChildren = GetSerializableChildren();
 
             var lazyContext = CreateLazySerializationContext();
@@ -187,6 +201,20 @@ namespace BinarySerialization.Graph.ValueGraph
                 await customValueNode.SerializeOverrideAsync(stream, eventShuttle, cancellationToken)
                     .ConfigureAwait(false);
 
+                return;
+            }
+
+            if (TypeNode.CustomSerializerType != null)
+            {
+                var customSerializer = Activator.CreateInstance(TypeNode.CustomSerializerType) as CustomSerializer;
+
+                if (customSerializer == null)
+                {
+                    throw new Exception("Could not instantiate CustomSerializer.");
+                }
+                
+                customSerializer.Serialize(stream, Value);
+                
                 return;
             }
 
@@ -219,6 +247,20 @@ namespace BinarySerialization.Graph.ValueGraph
                 return;
             }
 
+            if (TypeNode.CustomSerializerType != null)
+            {
+                var customSerializer = Activator.CreateInstance(TypeNode.CustomSerializerType) as CustomSerializer;
+
+                if (customSerializer == null)
+                {
+                    throw new Exception("Could not instantiate CustomSerializer.");
+                }
+                
+                Value = customSerializer.Deserialize(stream, _valueType);
+                
+                return;
+            }
+            
             var lazyContext = CreateLazySerializationContext();
 
             foreach (var child in GetSerializableChildren())
@@ -245,6 +287,20 @@ namespace BinarySerialization.Graph.ValueGraph
                 // this is a cheat, but another side-effect of this weird corner case
                 _cachedValue = customValueNode.Value;
 
+                return;
+            }
+
+            if (TypeNode.CustomSerializerType != null)
+            {
+                var customSerializer = Activator.CreateInstance(TypeNode.CustomSerializerType) as CustomSerializer;
+
+                if (customSerializer == null)
+                {
+                    throw new Exception("Could not instantiate CustomSerializer.");
+                }
+                
+                Value = customSerializer.Deserialize(stream, _valueType);
+                
                 return;
             }
 
@@ -531,7 +587,7 @@ namespace BinarySerialization.Graph.ValueGraph
         {
             var objectTypeNode = (ObjectTypeNode) (_subTypeNode ?? TypeNode);
             var unorderedChild = objectTypeNode.UnorderedChildren?.FirstOrDefault();
-            if (unorderedChild != null)
+            if (TypeNode.CustomSerializerType == null && unorderedChild != null)
             {
                 throw new InvalidOperationException(
                     $"'{unorderedChild.Name}' does not have a FieldOrder attribute.  " +

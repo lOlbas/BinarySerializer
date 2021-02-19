@@ -52,6 +52,7 @@ namespace BinarySerialization.Graph.TypeGraph
             };
 
         private readonly SerializedType? _serializedType;
+        public Type CustomSerializerType { get; private set; }
 
         protected TypeNode(TypeNode parent)
             : base(parent)
@@ -148,6 +149,7 @@ namespace BinarySerialization.Graph.TypeGraph
             if (serializeAsAttribute != null)
             {
                 _serializedType = serializeAsAttribute.SerializedType;
+                CustomSerializerType = serializeAsAttribute.CustomSerializerType;
 
 #pragma warning disable 618
                 if (_serializedType == SerializedType.NullTerminatedString)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace BinarySerialization
 {
@@ -18,9 +19,24 @@ namespace BinarySerialization
         /// <summary>
         ///     Initializes a new instance of the SerializeAs class with a specified <see cref="SerializedType" />.
         /// </summary>
-        public SerializeAsAttribute(SerializedType serializedType)
+        public SerializeAsAttribute(SerializedType serializedType, Type customSerializerType = null)
         {
             SerializedType = serializedType;
+
+            if (customSerializerType != null)
+            {
+                if (SerializedType != SerializedType.CustomSerializer)
+                {
+                    throw new ArgumentException("Parameter \"customSerializerType\"  ");
+                }
+                
+                if (!typeof(CustomSerializer).IsAssignableFrom(customSerializerType))
+                {
+                    throw new ArgumentException("Type must implement CustomSerializer", nameof(customSerializerType));
+                }
+                
+                CustomSerializerType = customSerializerType;
+            }
         }
 
         /// <summary>
@@ -32,5 +48,7 @@ namespace BinarySerialization
         /// Specify the string terminator when the serialized type is TerminatedString.  Null (zero) by default.
         /// </summary>
         public char StringTerminator { get; set; }
+
+        public Type CustomSerializerType { get; set; }
     }
 }
